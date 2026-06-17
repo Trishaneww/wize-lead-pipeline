@@ -18,6 +18,32 @@ draft, then pushes it to Gmail as a **draft** to send manually.
 - Encrypt the Gmail refresh token at rest in Postgres (use `TOKEN_ENCRYPTION_KEY`).
 - The operator reviews and edits every draft before any send.
 
+## Cost & security guardrails (tracked deliverables)
+
+Goal: no runaway Anthropic spend, and no way for an outsider to trigger paid API
+calls on our behalf. Claude must NEVER be reachable from a public/client route —
+it is only ever called from server-side Inngest jobs over a bounded work-set.
+
+**Backstop (account-level, owner-owned, not code):** a monthly spend limit is set on
+the Anthropic workspace, and a dedicated, independently-revocable API key is used for
+this project. This is the ceiling that holds regardless of app behavior.
+
+**Phase 1 — cost guardrails in the pipeline:**
+- Inngest concurrency + throttle/rate-limit on the qualify and draft functions so a
+  bug can't fan out into thousands of model calls.
+- Per-run and per-day lead caps on ingestion.
+- Dedupe by `source_ref` (and idempotency) so the same lead is never re-processed and
+  re-charged.
+- Keep the Anthropic SDK's bounded `maxRetries`; never retry on non-retryable errors.
+
+**Phase 2–3 — security of the deployed surface:**
+- Auth.js + `allowed_emails` gate on the dashboard and every server action — no public access.
+- Verify Inngest signatures (`INNGEST_SIGNING_KEY`) on `/api/inngest` so only Inngest
+  can invoke jobs.
+- `ANTHROPIC_API_KEY` (and all secrets) stay server-only — in the `server` block of
+  `env.ts`, encrypted Vercel env, never shipped to the browser, never committed.
+- Rate-limit auth/login and any public route (Vercel/Upstash) against abuse.
+
 ## Tech stack (locked)
 
 TypeScript end to end · Next.js App Router (monolith) · Tailwind CSS + shadcn/ui ·
