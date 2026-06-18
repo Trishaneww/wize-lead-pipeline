@@ -19,7 +19,7 @@ import { ArrowUpRight, ExternalLink } from "lucide-react";
 import { StatusBadge } from "@/components/leads/StatusBadge";
 
 // Libs
-import { normalizeUrl } from "@/lib/helpers/url";
+import { normalizeUrl } from "@/lib/helpers/validate";
 import type { LeadListItem } from "@/types/leads";
 
 interface LeadSheetProps {

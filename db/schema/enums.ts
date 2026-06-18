@@ -1,30 +1,18 @@
 // Libs
 import { pgEnum } from "drizzle-orm/pg-core";
 
-export const leadSourceEnum = pgEnum("lead_source", ["places", "csv", "manual"]);
+// Constants
+import {
+  DRAFT_STATUSES,
+  LEAD_CHANNELS,
+  LEAD_SOURCES,
+  LEAD_STATUSES,
+} from "@/constants/enums";
 
-export const leadChannelEnum = pgEnum("lead_channel", [
-  "web_design",
-  "custom_software",
-]);
+export const leadSourceEnum = pgEnum("lead_source", LEAD_SOURCES);
 
-export const leadStatusEnum = pgEnum("lead_status", [
-  "new",
-  "auditing",
-  "qualified",
-  "disqualified",
-  "drafting",
-  "drafted",
-  "approved",
-  "draft_created",
-  "replied",
-  "archived",
-  "failed",
-]);
+export const leadChannelEnum = pgEnum("lead_channel", LEAD_CHANNELS);
 
-export const draftStatusEnum = pgEnum("draft_status", [
-  "generated",
-  "edited",
-  "approved",
-  "rejected",
-]);
+export const leadStatusEnum = pgEnum("lead_status", LEAD_STATUSES);
+
+export const draftStatusEnum = pgEnum("draft_status", DRAFT_STATUSES);

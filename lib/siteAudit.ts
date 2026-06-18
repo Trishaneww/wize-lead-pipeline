@@ -3,8 +3,8 @@ import * as cheerio from "cheerio";
 import { logger } from "@/lib/logger";
 import { runPageSpeed } from "@/lib/pagespeed";
 import { captureHomepageScreenshot } from "@/lib/screenshot";
+import { normalizeUrl } from "@/lib/helpers/validate";
 import {
-  normalizeUrl,
   extractSignals,
   extractVisibleText,
   deriveFindings,
@@ -30,7 +30,8 @@ export async function runSiteAudit(rawUrl: string): Promise<SiteAuditResult> {
 
   const $ = cheerio.load(html);
   const title = $("head > title").first().text().trim();
-  const metaDescription = $('meta[name="description"]').attr("content")?.trim() ?? "";
+  const metaDescription =
+    $('meta[name="description"]').attr("content")?.trim() ?? "";
   const hasViewportMeta = $('meta[name="viewport"]').length > 0;
   const signals = extractSignals($);
   const visibleText = extractVisibleText($);
@@ -38,7 +39,10 @@ export async function runSiteAudit(rawUrl: string): Promise<SiteAuditResult> {
   const [screenshot, pageSpeed] = await Promise.all([
     captureHomepageScreenshot(url),
     runPageSpeed(url).catch((error) => {
-      logger.warn({ url, err: error }, "PageSpeed lookup failed; continuing without performance data");
+      logger.warn(
+        { url, err: error },
+        "PageSpeed lookup failed; continuing without performance data",
+      );
       return null;
     }),
   ]);
@@ -83,7 +87,10 @@ async function fetchHtml(url: string): Promise<string | null> {
       redirect: "follow",
     });
     if (!response.ok) {
-      logger.warn({ url, status: response.status }, "Site fetch returned non-OK status");
+      logger.warn(
+        { url, status: response.status },
+        "Site fetch returned non-OK status",
+      );
       return null;
     }
     return await response.text();

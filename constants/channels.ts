@@ -1,3 +1,6 @@
+// Constants
+import { LEAD_CHANNELS } from "@/constants/enums";
+
 export const CHANNELS = {
   web_design: {
     key: "web_design",
@@ -41,9 +44,9 @@ export const CHANNELS = {
     draftFocus:
       "PLACEHOLDER — not yet built. Will lead with an operational missed opportunity and offer a discovery call about a custom build.",
   },
-} as const;
+} as const satisfies Record<Channel, unknown>;
 
-export type Channel = keyof typeof CHANNELS;
+export type Channel = (typeof LEAD_CHANNELS)[number];
 export type ChannelConfig = (typeof CHANNELS)[Channel];
 
 export const DEFAULT_CHANNEL: Channel = "web_design";
