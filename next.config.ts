@@ -7,6 +7,14 @@ const nextConfig: NextConfig = {
     "pino",
     "pino-pretty",
   ],
+  turbopack: {
+    rules: {
+      "*.svg": {
+        loaders: ["@svgr/webpack"],
+        as: "*.js",
+      },
+    },
+  },
 };
 
 export default nextConfig;

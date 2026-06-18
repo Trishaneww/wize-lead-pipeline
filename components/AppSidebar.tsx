@@ -4,6 +4,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+// Assets
+import WizeStudiosLogo from "@/public/wize-studios-logo.svg";
+
 // HTML Components
 import {
   Sidebar,
@@ -52,8 +55,8 @@ export function AppSidebar() {
           }
           className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-sidebar-accent/60"
         >
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-foreground text-sm font-semibold text-background">
-            W
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-foreground">
+            <WizeStudiosLogo className="size-[26px] text-[#BACDF9]" />
           </div>
           <div className="min-w-0 flex-1 leading-tight">
             <p className="truncate text-sm font-semibold text-foreground">
