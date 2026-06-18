@@ -6,9 +6,11 @@ import { useCallback, useState, useTransition } from "react";
 // Libs
 import {
   approveDraft,
+  createGmailDraftAction,
   rejectDraft,
   saveDraftEdits,
 } from "@/lib/actions/draftActions";
+import { displayToast } from "@/lib/helpers/toast";
 
 interface UseLeadDraftParams {
   draftId: string;
@@ -47,5 +49,30 @@ export const useLeadDraft = ({
     startTransition(() => rejectDraft({ draftId, leadId }));
   }, [draftId, leadId]);
 
-  return { body, setBody, hasUnsavedChanges, isPending, save, approve, reject };
+  const createDraft = useCallback(() => {
+    startTransition(async () => {
+      if (hasUnsavedChanges) {
+        await saveDraftEdits({ draftId, leadId, editedBody: body });
+        setSavedBody(body);
+      }
+      
+      const result = await createGmailDraftAction({ draftId, leadId });
+      if (result.ok) {
+        displayToast("Gmail draft created", "success");
+      } else {
+        displayToast(result.error, "error");
+      }
+    });
+  }, [hasUnsavedChanges, draftId, leadId, body, setSavedBody]);
+
+  return {
+    body,
+    setBody,
+    hasUnsavedChanges,
+    isPending,
+    save,
+    approve,
+    reject,
+    createDraft,
+  };
 };

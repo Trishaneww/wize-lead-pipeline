@@ -22,6 +22,7 @@ export type DetailLead = {
   id: string;
   businessName: string;
   status: LeadStatus;
+  email: string | null;
   city: string | null;
   category: string | null;
   websiteUrl: string | null;
