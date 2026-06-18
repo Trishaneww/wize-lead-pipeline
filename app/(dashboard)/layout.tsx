@@ -1,3 +1,6 @@
+// Next.js
+import { redirect } from "next/navigation";
+
 // HTML Components
 import {
   SidebarInset,
@@ -9,11 +12,17 @@ import { Separator } from "@/components/ui/separator";
 // Components
 import { AppSidebar } from "@/components/AppSidebar";
 
-export default function DashboardLayout({
+// Libs
+import { auth } from "@/auth";
+
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
+  if (!session?.user) redirect("/login");
+
   return (
     <SidebarProvider>
       <AppSidebar />

@@ -55,6 +55,7 @@ export default async function LeadDetailPage({
         id: lead.id,
         businessName: lead.businessName,
         status: lead.status,
+        email: lead.email,
         city: lead.city,
         category: lead.category,
         websiteUrl: lead.websiteUrl,
