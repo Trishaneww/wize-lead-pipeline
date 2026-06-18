@@ -147,12 +147,22 @@ const DraftEditor = ({
   lead: DetailLead;
   draft: NonNullable<DetailDraft>;
 }) => {
-  const { body, setBody, hasUnsavedChanges, isPending, save, approve, reject } =
-    useLeadDraft({
-      draftId: draft.id,
-      leadId: lead.id,
-      initialBody: draft.body,
-    });
+  const {
+    body,
+    setBody,
+    hasUnsavedChanges,
+    isPending,
+    save,
+    approve,
+    reject,
+    createDraft,
+  } = useLeadDraft({
+    draftId: draft.id,
+    leadId: lead.id,
+    initialBody: draft.body,
+  });
+
+  const hasEmail = !!lead.email;
 
   return (
     <Card>
@@ -207,20 +217,32 @@ const DraftEditor = ({
             <X className="size-4" /> Reject
           </Button>
 
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="ml-auto">
-                  <Button size="sm" variant="secondary" disabled>
-                    <Mail className="size-4" /> Create Gmail draft
-                  </Button>
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                Gmail integration arrives in Phase 3
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          {hasEmail ? (
+            <Button
+              size="sm"
+              variant="secondary"
+              className="ml-auto"
+              onClick={createDraft}
+              disabled={isPending}
+            >
+              <Mail className="size-4" /> Create Gmail draft
+            </Button>
+          ) : (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="ml-auto">
+                    <Button size="sm" variant="secondary" disabled>
+                      <Mail className="size-4" /> Create Gmail draft
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  This lead has no email address
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
       </CardContent>
     </Card>
