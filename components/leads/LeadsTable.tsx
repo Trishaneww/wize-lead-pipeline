@@ -49,7 +49,11 @@ import { ScoreBars } from "@/components/leads/ScoreBars";
 import { SourceIcon } from "@/components/leads/SourceIcon";
 
 // Libs
-import { formatRelativeDate, getInitials } from "@/lib/helpers/format";
+import {
+  formatRelativeDate,
+  getAvatarColor,
+  getInitials,
+} from "@/lib/helpers/format";
 import { getPaginationRange } from "@/lib/helpers/pagination";
 import { displayToast } from "@/lib/helpers/toast";
 import { cn } from "@/lib/utils";
@@ -210,7 +214,9 @@ export const LeadsTable = ({ leads }: { leads: LeadListItem[] }) => {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="size-8">
-                        <AvatarFallback className="bg-accent-subtle text-xs font-medium text-primary">
+                        <AvatarFallback
+                          className={`text-xs font-medium ${getAvatarColor(lead.id)}`}
+                        >
                           {getInitials(lead.businessName)}
                         </AvatarFallback>
                       </Avatar>

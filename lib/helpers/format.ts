@@ -21,3 +21,18 @@ export function getInitials(name: string): string {
     .map((word) => word[0]?.toUpperCase() ?? "")
     .join("");
 }
+
+const AVATAR_COLORS = [
+  "bg-muted text-foreground",
+  "bg-foreground text-background",
+  "bg-avatar-navy text-white",
+  "bg-avatar-green text-white",
+] as const;
+
+export function getAvatarColor(seed: string): string {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+  return AVATAR_COLORS[hash % AVATAR_COLORS.length];
+}

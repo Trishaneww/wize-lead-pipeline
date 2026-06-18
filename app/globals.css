@@ -34,6 +34,9 @@
   --destructive-foreground: #ffffff;
   --info: #2f66e8;
 
+  --avatar-navy: #2e4a8f;
+  --avatar-green: #5d7a1e;
+
   --sidebar: #f9fafb;
   --sidebar-foreground: #4a5468;
   --sidebar-primary: #2f66e8;
@@ -72,6 +75,9 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-info: var(--info);
+
+  --color-avatar-navy: var(--avatar-navy);
+  --color-avatar-green: var(--avatar-green);
 
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
