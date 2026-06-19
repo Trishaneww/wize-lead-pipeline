@@ -8,6 +8,7 @@ import { z } from "zod";
 import { inngest } from "@/lib/clients/inngest";
 import { EVENTS, placesSourceRequestedData } from "@/constants/events";
 import { AppError } from "@/lib/errors";
+import { logger } from "@/lib/logger";
 import { requireOperator } from "@/lib/helpers/auth";
 
 // Types
@@ -42,6 +43,8 @@ export async function runPlacesIngestion(input: {
     if (error instanceof AppError) {
       return { ok: false, error: "You're not authorized to start ingestion." };
     }
+    
+    logger.error({ err: error }, "runPlacesIngestion failed");
     return { ok: false, error: "Could not start ingestion. Try again." };
   }
 }
