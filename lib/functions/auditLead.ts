@@ -15,7 +15,7 @@ export const auditLead = inngest.createFunction(
     triggers: [{ event: EVENTS.leadCreated }],
   },
   async ({ event, step }) => {
-    const { leadId } = leadRefData.parse(event.data);
+    const { leadId, batch } = leadRefData.parse(event.data);
 
     const lead = await step.run("load-lead", () => getLeadById(leadId));
     if (!lead) return { skipped: "lead-not-found" };
@@ -66,7 +66,7 @@ export const auditLead = inngest.createFunction(
 
     await step.sendEvent("emit-lead-audited", {
       name: EVENTS.leadAudited,
-      data: { leadId },
+      data: { leadId, batch },
     });
     return { auditId: auditMeta.auditId };
   },

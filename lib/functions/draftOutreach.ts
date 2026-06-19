@@ -15,7 +15,7 @@ export const draftOutreach = inngest.createFunction(
     throttle: { limit: 20, period: "1m" },
     retries: 2,
     onFailure: markLeadFailed,
-    triggers: [{ event: EVENTS.leadQualified }],
+    triggers: [{ event: EVENTS.leadQualified, if: "event.data.batch != true" }],
   },
   async ({ event, step }) => {
     const { leadId, angle, reasoning } = leadQualifiedData.parse(event.data);

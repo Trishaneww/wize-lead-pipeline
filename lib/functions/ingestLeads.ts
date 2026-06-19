@@ -12,6 +12,7 @@ import {
 } from "@/lib/queries/ingestionRuns";
 import { MAX_LEADS_PER_RUN } from "@/constants/leads";
 import { MAX_LEADS_PER_DAY } from "@/constants/ingestion";
+import { isBatchSource } from "@/lib/functions/shared";
 
 export const ingestLeads = inngest.createFunction(
   {
@@ -87,11 +88,12 @@ export const ingestLeads = inngest.createFunction(
     });
 
     if (createdIds.length > 0) {
+      const batch = isBatchSource(data.source);
       await step.sendEvent(
         "emit-lead-created",
         createdIds.map((leadId) => ({
           name: EVENTS.leadCreated,
-          data: { leadId },
+          data: { leadId, batch },
         })),
       );
     }

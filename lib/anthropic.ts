@@ -79,6 +79,86 @@ export async function generateOutreachDraft(
   };
 }
 
+type BatchRequest = Anthropic.Messages.Batches.BatchCreateParams.Request;
+
+export function buildQualifyBatchRequest(
+  customId: string,
+  input: QualifyInput,
+): BatchRequest {
+  const { system, user } = buildQualifyPrompt(input);
+  return {
+    custom_id: customId,
+    params: {
+      model: QUALIFY_MODEL,
+      max_tokens: 1024,
+      system,
+      messages: [
+        { role: "user", content: buildMessageContent(user, input.audit) },
+      ],
+      output_config: { format: zodOutputFormat(QualificationResultSchema) },
+    },
+  };
+}
+
+export function buildDraftBatchRequest(
+  customId: string,
+  input: DraftInput,
+): BatchRequest {
+  const { system, user } = buildDraftPrompt(input);
+  return {
+    custom_id: customId,
+    params: {
+      model: DRAFT_MODEL,
+      max_tokens: 1500,
+      system,
+      messages: [
+        { role: "user", content: buildMessageContent(user, input.audit) },
+      ],
+      output_config: { format: zodOutputFormat(OutreachDraftSchema) },
+    },
+  };
+}
+
+export function parseQualifyBatchResult(
+  message: Anthropic.Message,
+): QualificationResult {
+  return parseStructured(message, QualificationResultSchema);
+}
+
+export function parseDraftBatchResult(
+  message: Anthropic.Message,
+): OutreachDraftResult {
+  const parsed = parseStructured(message, OutreachDraftSchema);
+  return { subject: parsed.subject, body: ensureOptOut(parsed.body) };
+}
+
+function parseStructured<T>(
+  message: Anthropic.Message,
+  schema: z.ZodType<T>,
+): T {
+  const textBlock = message.content.find((block) => block.type === "text");
+  if (!textBlock || textBlock.type !== "text") {
+    throw new AnthropicParseError(
+      `Batch result has no text block (stop_reason: ${message.stop_reason})`,
+    );
+  }
+  let json: unknown;
+  try {
+    json = JSON.parse(textBlock.text);
+  } catch (cause) {
+    throw new AnthropicParseError("Batch result text is not valid JSON", {
+      cause,
+    });
+  }
+  const result = schema.safeParse(json);
+  if (!result.success) {
+    throw new AnthropicParseError(
+      `Batch result failed schema validation: ${result.error.message}`,
+    );
+  }
+  return result.data;
+}
+
 function buildMessageContent(
   text: string,
   audit: SiteAuditResult,

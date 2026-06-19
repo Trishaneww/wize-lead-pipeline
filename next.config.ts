@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   serverExternalPackages: [
     "playwright",
     "playwright-core",
+    "@sparticuz/chromium",
     "pino",
     "pino-pretty",
   ],

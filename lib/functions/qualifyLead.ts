@@ -14,7 +14,7 @@ export const qualifyLead = inngest.createFunction(
     throttle: { limit: 20, period: "1m" },
     retries: 2,
     onFailure: markLeadFailed,
-    triggers: [{ event: EVENTS.leadAudited }],
+    triggers: [{ event: EVENTS.leadAudited, if: "event.data.batch != true" }],
   },
   async ({ event, step }) => {
     const { leadId } = leadRefData.parse(event.data);

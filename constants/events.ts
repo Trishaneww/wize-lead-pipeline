@@ -39,10 +39,14 @@ export const placesSourceRequestedData = z.object({
   limit: z.number().int().positive().max(20).optional(),
 });
 
-export const leadRefData = z.object({ leadId: z.uuid() });
+export const leadRefData = z.object({
+  leadId: z.uuid(),
+  batch: z.boolean().optional().default(false),
+});
 
 export const leadQualifiedData = z.object({
   leadId: z.uuid(),
   angle: z.string().min(1),
   reasoning: z.string().min(1),
+  batch: z.boolean().optional().default(false),
 });
