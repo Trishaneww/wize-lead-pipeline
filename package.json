@@ -12,10 +12,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "inngest": "npx --yes inngest-cli@latest dev -u http://localhost:3000/api/inngest",
-    "seed": "tsx --env-file=.env.local scripts/seedLeads.ts",
-    "seed:allowed": "tsx --env-file=.env.local scripts/seedAllowedEmails.ts",
-    "test": "vitest run",
-    "validate": "tsx --env-file=.env.local scripts/validate-pipeline.ts"
+    "test": "vitest run"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.2",
