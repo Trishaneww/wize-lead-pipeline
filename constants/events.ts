@@ -6,6 +6,7 @@ import { LEAD_CHANNELS, LEAD_SOURCES } from "@/constants/enums";
 
 export const EVENTS = {
   ingestRequested: "lead/ingest.requested",
+  placesSourceRequested: "lead/places.source.requested",
   leadCreated: "lead/created",
   leadAudited: "lead/audited",
   leadQualified: "lead/qualified",
@@ -18,6 +19,7 @@ export const leadInputSchema = z.object({
   category: z.string().nullish(),
   email: z.string().nullish(),
   phone: z.string().nullish(),
+  address: z.string().nullish(),
   sourceRef: z.string().nullish(),
 });
 
@@ -28,6 +30,13 @@ export const ingestRequestedData = z.object({
   source: z.enum(LEAD_SOURCES).default("manual"),
   query: z.string().nullish(),
   businesses: z.array(leadInputSchema).min(1),
+});
+
+export const placesSourceRequestedData = z.object({
+  channel: channelSchema.default("web_design"),
+  niche: z.string().min(1),
+  city: z.string().min(1),
+  limit: z.number().int().positive().max(20).optional(),
 });
 
 export const leadRefData = z.object({ leadId: z.uuid() });
