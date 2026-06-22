@@ -102,3 +102,12 @@ export async function rejectDraft(input: {
   revalidatePath(`/leads/${input.leadId}`);
   revalidatePath("/leads");
 }
+
+export async function markLeadReplied(input: {
+  leadId: string;
+}): Promise<void> {
+  await requireOperator();
+  await updateLead(input.leadId, { status: "replied" });
+  revalidatePath(`/leads/${input.leadId}`);
+  revalidatePath("/leads");
+}

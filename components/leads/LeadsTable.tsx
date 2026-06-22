@@ -73,6 +73,8 @@ const TABS: { label: string; value: StatusFilter }[] = [
   { label: "Qualified", value: "qualified" },
   { label: "Drafted", value: "drafted" },
   { label: "Approved", value: "approved" },
+  { label: "Gmail draft", value: "draft_created" },
+  { label: "Replied", value: "replied" },
   { label: "Disqualified", value: "disqualified" },
 ];
 

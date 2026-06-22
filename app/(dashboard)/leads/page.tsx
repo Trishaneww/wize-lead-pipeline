@@ -8,6 +8,8 @@ import { LeadsHeaderActions } from "@/components/leads/LeadsHeaderActions";
 
 // Libs
 import { listLeads } from "@/lib/queries/leads";
+import { getDailyLeadCounts } from "@/lib/queries/stats";
+import { buildStatCards } from "@/lib/helpers/stats";
 
 // Types
 import type { LeadListItem } from "@/types/leads";
@@ -16,7 +18,10 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export default async function LeadsPage() {
-  const leadRows = await listLeads();
+  const [leadRows, daily] = await Promise.all([
+    listLeads(),
+    getDailyLeadCounts(),
+  ]);
 
   const leads: LeadListItem[] = leadRows.map((lead) => ({
     id: lead.id,
@@ -34,38 +39,7 @@ export default async function LeadsPage() {
     updatedAt: lead.updatedAt.toISOString(),
   }));
 
-  const count = (predicate: (l: LeadListItem) => boolean) =>
-    leads.filter(predicate).length;
-  const stats = [
-    {
-      label: "Total leads",
-      value: leads.length,
-      delta: { value: "12%", positive: true },
-      series: [4, 6, 5, 8, 7, 10, 9, leads.length || 11],
-    },
-    {
-      label: "Qualified",
-      value: count(
-        (l) => l.qualificationScore !== null && l.status !== "disqualified",
-      ),
-      delta: { value: "4%", positive: true },
-      series: [2, 3, 3, 4, 5, 4, 6, 7],
-    },
-    {
-      label: "Drafted",
-      value: count((l) =>
-        ["drafted", "approved", "draft_created"].includes(l.status),
-      ),
-      delta: { value: "8%", positive: true },
-      series: [1, 1, 2, 2, 3, 3, 4, 5],
-    },
-    {
-      label: "Needs review",
-      value: count((l) => l.status === "drafted"),
-      delta: { value: "2%", positive: false },
-      series: [3, 4, 3, 2, 3, 2, 2, 1],
-    },
-  ];
+  const stats = buildStatCards(leads, daily);
 
   return (
     <main className="space-y-6 p-6">

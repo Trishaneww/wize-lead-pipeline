@@ -7,6 +7,7 @@ import { useCallback, useState, useTransition } from "react";
 import {
   approveDraft,
   createGmailDraftAction,
+  markLeadReplied,
   rejectDraft,
   saveDraftEdits,
 } from "@/lib/actions/draftActions";
@@ -65,6 +66,13 @@ export const useLeadDraft = ({
     });
   }, [hasUnsavedChanges, draftId, leadId, body, setSavedBody]);
 
+  const markReplied = useCallback(() => {
+    startTransition(async () => {
+      await markLeadReplied({ leadId });
+      displayToast("Marked as replied", "success");
+    });
+  }, [leadId]);
+
   return {
     body,
     setBody,
@@ -74,5 +82,6 @@ export const useLeadDraft = ({
     approve,
     reject,
     createDraft,
+    markReplied,
   };
 };

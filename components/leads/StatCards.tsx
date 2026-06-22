@@ -8,7 +8,7 @@ import { Sparkline } from "@/components/leads/Sparkline";
 // Libs
 import { cn } from "@/lib/utils";
 
-interface Stat {
+export interface Stat {
   label: string;
   value: number | string;
   delta?: { value: string; positive: boolean };
