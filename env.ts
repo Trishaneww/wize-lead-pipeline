@@ -19,6 +19,8 @@ export const env = createEnv({
     INNGEST_EVENT_KEY: z.string().min(1).optional(),
     INNGEST_SIGNING_KEY: z.string().min(1).optional(),
 
+    SENTRY_DSN: z.string().url().optional(),
+
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   },
   client: {},
@@ -34,6 +36,7 @@ export const env = createEnv({
     TOKEN_ENCRYPTION_KEY: process.env.TOKEN_ENCRYPTION_KEY,
     INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY,
     INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY,
+    SENTRY_DSN: process.env.SENTRY_DSN,
     NODE_ENV: process.env.NODE_ENV,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

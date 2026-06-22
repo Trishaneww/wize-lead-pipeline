@@ -8,7 +8,7 @@ export default defineConfig({
     },
   },
   test: {
-    env: { SKIP_ENV_VALIDATION: "true" },
+    env: { SKIP_ENV_VALIDATION: "true", ANTHROPIC_API_KEY: "test" },
     include: ["**/*.test.ts"],
     exclude: ["node_modules", ".next"],
   },
