@@ -33,3 +33,17 @@ export async function markLeadFailed({
     });
   }
 }
+
+export function isBatchSource(source: LeadRow["source"]): boolean {
+  return source === "places" || source === "csv";
+}
+
+export async function markLeadsFailed(
+  leadIds: string[],
+  reason: string,
+): Promise<void> {
+  const failureReason = reason.slice(0, 500);
+  for (const leadId of leadIds) {
+    await updateLead(leadId, { status: "failed", failureReason });
+  }
+}

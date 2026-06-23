@@ -1,5 +1,5 @@
 // Libs
-import { and, desc, eq, or } from "drizzle-orm";
+import { and, count, desc, eq, gte, or } from "drizzle-orm";
 import { db } from "@/db";
 import { leads } from "@/db/schema";
 
@@ -33,6 +33,14 @@ export async function updateLead(
 
 export async function listLeads(): Promise<LeadRow[]> {
   return db.select().from(leads).orderBy(desc(leads.updatedAt));
+}
+
+export async function countLeadsCreatedSince(since: Date): Promise<number> {
+  const [row] = await db
+    .select({ n: count() })
+    .from(leads)
+    .where(gte(leads.createdAt, since));
+  return row?.n ?? 0;
 }
 
 export async function findDuplicateLead(

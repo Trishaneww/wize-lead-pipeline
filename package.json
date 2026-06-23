@@ -12,14 +12,14 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "inngest": "npx --yes inngest-cli@latest dev -u http://localhost:3000/api/inngest",
-    "seed": "tsx --env-file=.env.local scripts/seedLeads.ts",
-    "seed:allowed": "tsx --env-file=.env.local scripts/seedAllowedEmails.ts",
-    "validate": "tsx --env-file=.env.local scripts/validate-pipeline.ts"
+    "test": "vitest run"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.2",
     "@auth/drizzle-adapter": "^1.11.2",
     "@neondatabase/serverless": "^1.1.0",
+    "@sentry/nextjs": "^10.58.0",
+    "@sparticuz/chromium": "^149.0.0",
     "@t3-oss/env-nextjs": "^0.13.11",
     "cheerio": "^1.2.0",
     "class-variance-authority": "^0.7.1",
@@ -32,6 +32,7 @@
     "next-themes": "^0.4.6",
     "pino": "^10.3.1",
     "pino-pretty": "^13.1.3",
+    "playwright-core": "^1.61.0",
     "radix-ui": "^1.6.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",

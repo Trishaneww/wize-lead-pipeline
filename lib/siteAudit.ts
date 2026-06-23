@@ -7,6 +7,8 @@ import { normalizeUrl } from "@/lib/helpers/validate";
 import {
   extractSignals,
   extractVisibleText,
+  extractContactEmail,
+  findContactUrl,
   deriveFindings,
   buildSiteSummary,
   unreachableResult,
@@ -14,18 +16,21 @@ import {
 
 // Types
 import type { SiteAuditResult } from "@/types/audits";
+export type SiteAuditOutcome = SiteAuditResult & {
+  contactEmail: string | null;
+};
 
 const FETCH_TIMEOUT_MS = 15_000;
 const USER_AGENT =
   "Mozilla/5.0 (compatible; WizeStudiosAuditBot/1.0; +https://wizestudios.ca)";
 
-export async function runSiteAudit(rawUrl: string): Promise<SiteAuditResult> {
+export async function runSiteAudit(rawUrl: string): Promise<SiteAuditOutcome> {
   const url = normalizeUrl(rawUrl);
   const hasHttps = url.startsWith("https://");
 
   const html = await fetchHtml(url);
   if (html === null) {
-    return unreachableResult(hasHttps);
+    return { ...unreachableResult(hasHttps), contactEmail: null };
   }
 
   const $ = cheerio.load(html);
@@ -34,9 +39,11 @@ export async function runSiteAudit(rawUrl: string): Promise<SiteAuditResult> {
     $('meta[name="description"]').attr("content")?.trim() ?? "";
   const hasViewportMeta = $('meta[name="viewport"]').length > 0;
   const signals = extractSignals($);
+  let contactEmail = extractContactEmail($);
   const visibleText = extractVisibleText($);
+  const contactUrl = contactEmail ? null : findContactUrl($, url);
 
-  const [screenshot, pageSpeed] = await Promise.all([
+  const [screenshot, pageSpeed, contactHtml] = await Promise.all([
     captureHomepageScreenshot(url),
     runPageSpeed(url).catch((error) => {
       logger.warn(
@@ -45,7 +52,12 @@ export async function runSiteAudit(rawUrl: string): Promise<SiteAuditResult> {
       );
       return null;
     }),
+    contactUrl ? fetchHtml(contactUrl) : Promise.resolve(null),
   ]);
+
+  if (!contactEmail && contactHtml) {
+    contactEmail = extractContactEmail(cheerio.load(contactHtml));
+  }
 
   const performanceScore = pageSpeed?.performanceScore ?? null;
   const lcpMs = pageSpeed?.lcpMs ?? null;
@@ -74,6 +86,7 @@ export async function runSiteAudit(rawUrl: string): Promise<SiteAuditResult> {
     visibleText,
     screenshotBase64: screenshot?.base64 ?? null,
     rawPagespeed: pageSpeed?.raw ?? null,
+    contactEmail,
   };
 }
 

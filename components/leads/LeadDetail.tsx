@@ -11,7 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Check, Mail, Save, X } from "lucide-react";
+import { Check, Mail, MessageSquareReply, Save, X } from "lucide-react";
 
 // Components
 import { StatusBadge } from "@/components/leads/StatusBadge";
@@ -156,6 +156,7 @@ const DraftEditor = ({
     approve,
     reject,
     createDraft,
+    markReplied,
   } = useLeadDraft({
     draftId: draft.id,
     leadId: lead.id,
@@ -163,6 +164,8 @@ const DraftEditor = ({
   });
 
   const hasEmail = !!lead.email;
+  const canMarkReplied =
+    lead.status === "draft_created" || lead.status === "approved";
 
   return (
     <Card>
@@ -237,11 +240,20 @@ const DraftEditor = ({
                     </Button>
                   </span>
                 </TooltipTrigger>
-                <TooltipContent>
-                  This lead has no email address
-                </TooltipContent>
+                <TooltipContent>This lead has no email address</TooltipContent>
               </Tooltip>
             </TooltipProvider>
+          )}
+
+          {canMarkReplied && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={markReplied}
+              disabled={isPending}
+            >
+              <MessageSquareReply className="size-4" /> Mark replied
+            </Button>
           )}
         </div>
       </CardContent>

@@ -15,7 +15,7 @@ export const auditLead = inngest.createFunction(
     triggers: [{ event: EVENTS.leadCreated }],
   },
   async ({ event, step }) => {
-    const { leadId } = leadRefData.parse(event.data);
+    const { leadId, batch } = leadRefData.parse(event.data);
 
     const lead = await step.run("load-lead", () => getLeadById(leadId));
     if (!lead) return { skipped: "lead-not-found" };
@@ -40,7 +40,11 @@ export const auditLead = inngest.createFunction(
     const auditMeta = await step.run("run-and-persist-audit", async () => {
       const audit = await runSiteAudit(websiteUrl);
       const row = await insertAudit(auditResultToRow(leadId, audit));
-      return { auditId: row.id, reachable: audit.reachable };
+      return {
+        auditId: row.id,
+        reachable: audit.reachable,
+        contactEmail: audit.contactEmail,
+      };
     });
 
     if (!auditMeta.reachable) {
@@ -53,9 +57,16 @@ export const auditLead = inngest.createFunction(
       return { disqualified: "unreachable" };
     }
 
+    const scrapedEmail = auditMeta.contactEmail;
+    if (scrapedEmail && !lead.email) {
+      await step.run("enrich-email", () =>
+        updateLead(leadId, { email: scrapedEmail }),
+      );
+    }
+
     await step.sendEvent("emit-lead-audited", {
       name: EVENTS.leadAudited,
-      data: { leadId },
+      data: { leadId, batch },
     });
     return { auditId: auditMeta.auditId };
   },

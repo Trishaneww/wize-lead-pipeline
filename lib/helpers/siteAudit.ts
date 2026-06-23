@@ -67,6 +67,78 @@ export function extractVisibleText($: cheerio.CheerioAPI): string {
   return text.slice(0, 2000);
 }
 
+const EMAIL_PATTERN = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+const BLOCKED_EMAIL =
+  /sentry|wixpress|wix\.com|squarespace|googleapis|gstatic|cloudflare|schema\.org|example\.(com|org|net)|yourdomain|domain\.com|email\.com|sentry\.io/i;
+const ASSET_EXTENSION = /\.(png|jpe?g|gif|webp|svg|css|js|ico)$/i;
+
+export function extractContactEmail($: cheerio.CheerioAPI): string | null {
+  const candidates: string[] = [];
+
+  $('a[href^="mailto:" i]').each((_, el) => {
+    const raw = ($(el).attr("href") ?? "")
+      .replace(/^mailto:/i, "")
+      .split("?")[0];
+    if (!raw) return;
+    try {
+      candidates.push(decodeURIComponent(raw).trim());
+    } catch {
+      candidates.push(raw.trim());
+    }
+  });
+
+  const body = $("body").clone();
+  body.find("script, style, noscript, svg").remove();
+  candidates.push(...(body.text().match(EMAIL_PATTERN) ?? []));
+
+  for (const candidate of candidates) {
+    const email = candidate.toLowerCase();
+    if (isValidContactEmail(email)) return email;
+  }
+  return null;
+}
+
+function isValidContactEmail(email: string): boolean {
+  if (email.length < 6 || email.length > 254) return false;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return false;
+  if (ASSET_EXTENSION.test(email)) return false;
+  if (BLOCKED_EMAIL.test(email)) return false;
+  return true;
+}
+
+const CONTACT_LINK = /contact|get[\s-]?in[\s-]?touch|reach[\s-]?us/i;
+
+export function findContactUrl(
+  $: cheerio.CheerioAPI,
+  baseUrl: string,
+): string | null {
+  let origin: string;
+  try {
+    origin = new URL(baseUrl).origin;
+  } catch {
+    return null;
+  }
+
+  for (const el of $("a[href]").toArray()) {
+    const href = $(el).attr("href") ?? "";
+    const text = $(el).text();
+    if (!CONTACT_LINK.test(href) && !CONTACT_LINK.test(text)) continue;
+
+    let resolved: URL;
+    try {
+      resolved = new URL(href, baseUrl);
+    } catch {
+      continue;
+    }
+    if (resolved.protocol !== "http:" && resolved.protocol !== "https:")
+      continue;
+    if (resolved.origin !== origin) continue; // same-site only
+    if (resolved.pathname === "/" || resolved.pathname === "") continue; // not the homepage
+    return resolved.href;
+  }
+  return null;
+}
+
 export type FindingInputs = {
   hasHttps: boolean;
   hasViewportMeta: boolean;

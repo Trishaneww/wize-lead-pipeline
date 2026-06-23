@@ -4,6 +4,9 @@
 import { Button } from "@/components/ui/button";
 import { Bell, Download, Plus } from "lucide-react";
 
+// Components
+import { RunIngestionSheet } from "@/components/leads/RunIngestionSheet";
+
 // Libs
 import { displayToast } from "@/lib/helpers/toast";
 
@@ -25,6 +28,7 @@ export const LeadsHeaderActions = () => {
       >
         <Bell className="size-4" />
       </Button>
+      <RunIngestionSheet />
       <Button
         variant="secondary"
         size="sm"
